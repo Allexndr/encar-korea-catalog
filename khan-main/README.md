@@ -1,0 +1,95 @@
+# API для получения данных о машине с che168.com
+
+## Быстрый старт
+
+### 1. URL запроса
+
+```
+https://apipcmusc.che168.com/v1/car/getcarinfo?_appid=2sc.pc&infoid={ID_МАШИНЫ}
+```
+
+### 2. Как получить ID машины
+
+Из URL страницы: `https://www.che168.com/dealer/466343/56635701.html`
+- ID машины = `56635701` (последнее число в URL)
+
+### 3. Пример использования
+
+**Через браузер или curl:**
+```bash
+curl "https://apipcmusc.che168.com/v1/car/getcarinfo?_appid=2sc.pc&infoid=56635701"
+```
+
+**Через Python (см. файл `get_car_info.py`):**
+```python
+python3 get_car_info.py 56635701
+```
+
+## Что возвращает API
+
+JSON с данными о машине:
+- Название, марка, модель
+- Цена, пробег, год выпуска
+- ID дилера, название дилера
+- И многое другое
+
+## Скрипты
+
+### `get_engine_specs.py` - **ОСНОВНОЙ СКРИПТ** ⭐
+Класс CarSpecsRetriever с типизированными данными (TypedDict)
+
+**Возвращает структурированный объект CarInfo:**
+```python
+CarInfo = TypedDict('CarInfo', {
+    'car_name': str,      # Название автомобиля
+    'price': float,       # Цена в 万 RMB
+    'engine_size': int,   # Объем двигателя в см³
+    'engine_type': str,   # Тип двигателя
+    'mileage': int,       # Пробег в км
+    'year': int,          # Год выпуска
+    'month': int,         # Месяц выпуска
+    'transmission': str   # Тип коробки передач
+})
+```
+
+**Использование:**
+```python
+from get_engine_specs import CarSpecsRetriever
+
+car_info = CarSpecsRetriever.get_car_info(57369943)
+if car_info:
+    print(f"Машина: {car_info['car_name']}")
+    print(f"Двигатель: {car_info['engine_type']}")
+    print(f"Объем: {car_info['engine_size']} см³")
+```
+
+**Вывод скрипта:**
+```bash
+python3 get_engine_specs.py 57369943
+```
+
+```
+🚗 宝马5系 2019款 530Li 领先型 豪华套装
+💰 Цена: 15.6万 RMB
+🔧 Двигатель: 2.0T 252马力 L4
+📏 Объем: 1998 см³
+⚙️ Коробка: 8挡手自一体
+🛣️ Пробег: 157000 км
+📅 Год/месяц: 2019.09
+```
+
+### `get_full_car_info.py` - ПОЛНАЯ ИНФОРМАЦИЯ
+Полная информация о машине со всеми деталями
+
+### `get_car_info.py` - БАЗОВАЯ ИНФОРМАЦИЯ
+Только основные данные (цена, пробег, год)
+
+## Файлы в этой папке
+
+- `get_engine_specs.py` - **ключевые характеристики** ⭐
+- `get_full_car_info.py` - полная информация
+- `get_car_info.py` - базовая информация
+- `README.md` - эта инструкция
+- `requirements.txt` - зависимости Python
+
+
