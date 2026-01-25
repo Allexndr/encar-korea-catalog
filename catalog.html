@@ -301,8 +301,37 @@
 
         async function loadCatalog() {
             const catalog = document.getElementById('catalog');
-            const cars = await Promise.all(ACTIVE_CAR_IDS.map(id => fetchCar(id)));
-            catalog.innerHTML = cars.map((car, i) => car ? createCarCard(car, ACTIVE_CAR_IDS[i]) : `<div class="error-card">⚠️ Available on Encar<br>(ID: ${ACTIVE_CAR_IDS[i]})</div>`).join('');
+            // Try primary IDs
+            const primaryCars = await Promise.all(ACTIVE_CAR_IDS.map(id => fetchCar(id)));
+            // Get fallback IDs from backend
+            let fallbackIds = [];
+            try {
+                const res = await fetch('/api/fresh');
+                if (res.ok) {
+                    const data = await res.json();
+                    fallbackIds = data.ids || [];
+                }
+            } catch (e) { /* ignore */ }
+
+            const finalCars = [];
+            const finalIds = [...ACTIVE_CAR_IDS];
+            for (let i = 0; i < primaryCars.length; i++) {
+                if (primaryCars[i]) {
+                    finalCars.push(createCarCard(primaryCars[i], finalIds[i]));
+                } else if (fallbackIds.length) {
+                    const newId = fallbackIds.shift();
+                    const newCar = await fetchCar(newId);
+                    if (newCar) {
+                        finalCars.push(createCarCard(newCar, newId));
+                        finalIds[i] = newId;
+                    } else {
+                        finalCars.push(`<div class="error-card">⚠️ Unavailable<br>(ID: ${finalIds[i]})</div>`);
+                    }
+                } else {
+                    finalCars.push(`<div class="error-card">⚠️ Unavailable<br>(ID: ${finalIds[i]})</div>`);
+                }
+            }
+            catalog.innerHTML = finalCars.join('');
         }
 
         loadCatalog();

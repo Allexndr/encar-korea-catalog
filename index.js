@@ -48,22 +48,27 @@ app.get('/api/car/:id', async (req, res) => {
     }
 });
 
-// Прокси для изображений
-app.get('/api/image', async (req, res) => {
-    const imageUrl = req.query.url;
-    if (!imageUrl || !imageUrl.includes('encar.com')) return res.status(400).send('Invalid image URL');
-    try {
-        const response = await axios({
-            url: imageUrl,
-            method: 'GET',
-            responseType: 'stream',
-            headers: { ...MOBILE_HEADERS, 'Accept': 'image/webp,image/*;q=0.8' }
-        });
-        res.set('Content-Type', response.headers['content-type']);
-        response.data.pipe(res);
-    } catch (error) {
-        res.status(404).send('Not found');
-    }
+// Endpoint that returns a list of fresh car IDs (hard‑coded for now)
+app.get('/api/fresh', (req, res) => {
+    // These IDs are known to be live at the time of deployment.
+    const freshIds = [41005386, 40996900, 40995970, 40990943, 41389565];
+    res.json({ ids: freshIds });
+});
+
+const imageUrl = req.query.url;
+if (!imageUrl || !imageUrl.includes('encar.com')) return res.status(400).send('Invalid image URL');
+try {
+    const response = await axios({
+        url: imageUrl,
+        method: 'GET',
+        responseType: 'stream',
+        headers: { ...MOBILE_HEADERS, 'Accept': 'image/webp,image/*;q=0.8' }
+    });
+    res.set('Content-Type', response.headers['content-type']);
+    response.data.pipe(res);
+} catch (error) {
+    res.status(404).send('Not found');
+}
 });
 
 if (require.main === module) {
