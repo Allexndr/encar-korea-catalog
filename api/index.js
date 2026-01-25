@@ -3,15 +3,6 @@ const axios = require('axios');
 const path = require('path');
 
 const app = express();
-const PORT = 3001;
-
-// Serve static files
-app.use(express.static(__dirname));
-
-// Root route handler for landing page
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'catalog.html'));
-});
 
 // Headers that mimic a real iPhone Safari
 const MOBILE_HEADERS = {
@@ -46,7 +37,6 @@ app.get('/api/car/:id', async (req, res) => {
     } catch (error) {
         if (error.response) {
             console.error(`❌ Error ${carId}: Status ${error.response.status}`);
-            console.error(error.response.data);
             res.status(error.response.status).json(error.response.data);
         } else {
             console.error(`❌ Error ${carId}: ${error.message}`);
@@ -55,12 +45,11 @@ app.get('/api/car/:id', async (req, res) => {
     }
 });
 
-// Image Proxy to bypass hotlink protection
+// Image Proxy
 app.get('/api/image', async (req, res) => {
     const imageUrl = req.query.url;
     if (!imageUrl) return res.status(400).send('URL required');
 
-    // Ensure we are only proxying encar images
     if (!imageUrl.includes('encar.com')) {
         return res.status(400).send('Only Encar images allowed');
     }
@@ -76,7 +65,6 @@ app.get('/api/image', async (req, res) => {
             }
         });
 
-        // Forward content type
         res.set('Content-Type', response.headers['content-type']);
         response.data.pipe(res);
     } catch (error) {
@@ -85,10 +73,15 @@ app.get('/api/image', async (req, res) => {
     }
 });
 
-if (process.env.NODE_ENV !== 'production' || require.main === module) {
+// For local development
+if (process.env.NODE_ENV !== 'production' && require.main === module) {
+    const PORT = process.env.PORT || 3001;
+    app.use(express.static(path.join(__dirname, '..')));
+    app.get('/', (req, res) => {
+        res.sendFile(path.join(__dirname, '..', 'catalog.html'));
+    });
     app.listen(PORT, () => {
-        console.log(`🚗 Encar Demo Server running at http://localhost:${PORT}`);
-        console.log(`📱 Open your browser to see the demo!`);
+        console.log(`🚗 Local server running at http://localhost:${PORT}`);
     });
 }
 

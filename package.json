@@ -4,7 +4,7 @@
   "description": "Encar API Demo with 4 car cards",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node api/index.js"
   },
   "dependencies": {
     "express": "^4.18.2",
