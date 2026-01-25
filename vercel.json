@@ -6,8 +6,16 @@
             "destination": "/index.js"
         },
         {
-            "source": "/",
-            "destination": "/catalog.html"
+            "source": "/car.html",
+            "destination": "/index.js"
+        },
+        {
+            "source": "/car",
+            "destination": "/index.js"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/index.js"
         }
     ]
 }

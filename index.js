@@ -5,12 +5,22 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Разрешаем отдавать статические файлы (html, css, js) из корня
+// Разрешаем отдавать статические файлы (картинки, стили)
 app.use(express.static(__dirname));
 
-// Главная страница сразу открывает каталог
+// Главная страница
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'catalog.html'));
+});
+
+// Страница автомобиля (детальная)
+app.get('/car.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'car.html'));
+});
+
+// Короткий путь для удобства
+app.get('/car', (req, res) => {
+    res.sendFile(path.join(__dirname, 'car.html'));
 });
 
 // Заголовки для маскировки под iPhone
@@ -56,7 +66,6 @@ app.get('/api/image', async (req, res) => {
     }
 });
 
-// Запуск сервера (только если не в облаке Vercel)
 if (require.main === module) {
     app.listen(PORT, () => {
         console.log(`🚗 Server running at http://localhost:${PORT}`);
