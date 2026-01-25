@@ -2,9 +2,9 @@
   "name": "encar-demo",
   "version": "1.0.0",
   "description": "Encar API Demo with 4 car cards",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node api/index.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "express": "^4.18.2",
