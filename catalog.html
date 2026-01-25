@@ -311,6 +311,7 @@
             '디젤': 'Diesel',
             '가솔린': 'Gasoline',
             '휘발유': 'Gasoline',
+            '가솔린+전기': 'Gasoline + Hybrid',
             'LPG': 'LPG',
             '하이브리드': 'Hybrid',
             '전기': 'Electric',
@@ -318,7 +319,8 @@
             '흰색': 'White',
             '은색': 'Silver',
             '회색': 'Gray',
-            '파란색': 'Blue',
+            '쥐색': 'Dark Gray',
+            '파ран색': 'Blue',
             '빨간색': 'Red',
             '노란색': 'Yellow',
             '녹색': 'Green'
@@ -356,7 +358,10 @@
             const gradeName = cat.gradeEnglishName || cat.gradeName || '';
 
             const carName = `${manufacturerName} ${modelName} ${gradeName}`.trim() || 'Unknown Model';
-            const rawPhotoUrl = photos[0]?.location ? `http://ci.encar.com${photos[0].location}` : '';
+
+            // Subagent fix: check both location AND path
+            const rawPhotoPath = photos[0]?.location || photos[0]?.path || '';
+            const rawPhotoUrl = rawPhotoPath ? `http://ci.encar.com${rawPhotoPath}` : '';
             // Use our proxy
             const photoUrl = rawPhotoUrl ? `/api/image?url=${encodeURIComponent(rawPhotoUrl)}` : '';
 
@@ -364,7 +369,7 @@
                 <div class="card">
                     <div class="card-image-wrapper">
                         ${photoUrl
-                    ? `<img src="${photoUrl}" alt="${carName}" class="card-image" loading="lazy">`
+                    ? `<img src="${photoUrl}" alt="${carName}" class="card-image" loading="lazy" onerror="this.parentElement.innerHTML='<div class=image-loading>⚠️</div>'">`
                     : '<div class="image-loading"><div class="spinner"></div></div>'
                 }
                     </div>
@@ -430,7 +435,10 @@
 
         async function loadCatalog() {
             const catalog = document.getElementById('catalog');
-            catalog.innerHTML = '<div class="loading-screen"><div class="spinner"></div></div>';
+            // Keep content if refreshing
+            if (!catalog.children.length || catalog.querySelector('.loading-screen')) {
+                catalog.innerHTML = '<div class="loading-screen"><div class="spinner"></div></div>';
+            }
 
             const activePromises = ACTIVE_CAR_IDS.map(id => fetchCar(id));
             const activeCars = await Promise.all(activePromises);
@@ -438,11 +446,11 @@
 
             let html = '';
 
-            activeCars.forEach(car => {
+            activeCars.forEach((car, index) => {
                 if (car) {
                     html += createCarCard(car);
                 } else {
-                    html += '<div class="error-card">⚠️ Failed to load vehicle</div>';
+                    html += '<div class="error-card">⚠️ Vehicle sold or unavailable<br>(ID: ' + ACTIVE_CAR_IDS[index] + ')</div>';
                 }
             });
 

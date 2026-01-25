@@ -37,7 +37,7 @@ app.get('/api/car/:id', async (req, res) => {
     } catch (error) {
         if (error.response) {
             console.error(`❌ Error ${carId}: Status ${error.response.status}`);
-            res.status(error.response.status).json(error.response.data);
+            res.status(error.response.status).json({ error: 'Encar API error', status: error.response.status });
         } else {
             console.error(`❌ Error ${carId}: ${error.message}`);
             res.status(500).json({ error: 'Failed to fetch car data' });
