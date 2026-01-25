@@ -8,6 +8,10 @@
         {
             "source": "/",
             "destination": "/catalog.html"
+        },
+        {
+            "source": "/car",
+            "destination": "/car.html"
         }
     ]
 }
